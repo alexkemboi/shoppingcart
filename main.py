@@ -1,3 +1,4 @@
+
 class Product:
     """
     Represents a product in the store.
@@ -68,6 +69,40 @@ class Customer:
 
     def __init__(self, name):
         self.name = name
+        self.wishlist = set()  # Initialize an empty set to store wishlist items
+    
+    def add_to_wishlist(self, product):
+        """
+        Add a product to the customer's wishlist.
+
+        Args:
+            product (Product): The product to add to the wishlist.
+        """
+        self.wishlist.add(product)
+
+    def remove_from_wishlist(self, product):
+        """
+        Remove a product from the customer's wishlist.
+
+        Args:
+            product (Product): The product to remove from the wishlist.
+        """
+        self.wishlist.discard(product)
+
+    def view_wishlist(self):
+        """
+        View the products in the customer's wishlist.
+
+        Returns:
+            str: A string representation of the products in the wishlist.
+        """
+        if not self.wishlist:
+            return "Wishlist is empty."
+        wishlist_content = "\n".join(product.name for product in self.wishlist)
+        return f"Wishlist:\n{wishlist_content}"
+
+
+
 
 
 class LoyalCustomer(Customer):
@@ -168,15 +203,17 @@ def main():
         print("3. Add/remove a product to the shopping cart")
         print("4. See current shopping cart")
         print("5. Checkout")
+        print("6. Add/remove product to/from wishlist")
+        print("7. View wishlist")
         print("0. Exit")
 
         choice = int(input("Enter your choice: "))
 
-        if choice == 0:
+        if choice == 0: # Exit shopping flow    
             print("Thank you for using the shopping cart application. Goodbye!")
             break
 
-        elif choice == 1:
+        elif choice == 1: # Register customer
             name = input("Enter customer name: ")
             customer_type = input("Enter customer type (Loyal/Bargain): ").lower()
             if customer_type == "loyal":
@@ -186,12 +223,12 @@ def main():
             else:
                 print("Invalid customer type. Please choose 'Loyal' or 'Bargain'.")
 
-        elif choice == 2:
+        elif choice == 2: # View products
             print("\n===== Available Products =====")
             for i, product in enumerate(products, start=1):
                 print(f"{i}. {product}")
 
-        elif choice == 3:
+        elif choice == 3: # Add/remove products to cart
             if customer is None:
                 print("Please create a customer first (Option 1).")
             else:
@@ -218,7 +255,7 @@ def main():
                 else:
                     print("Invalid product index. Please choose a valid product.")
 
-        elif choice == 4:
+        elif choice == 4: # View shopping cart
             if customer is None:
                 print("Please create a customer first (Option 1).")
             else:
@@ -229,7 +266,7 @@ def main():
                     # For BargainHunter, display their shopping cart directly
                     print(customer.shopping_cart)
 
-        elif choice == 5:
+        elif choice == 5: # Cart checkout option
             if customer is None:
                 print("Please create a customer first (Option 1).")
             else:
@@ -258,6 +295,37 @@ def main():
                             break
                         else:
                             print("Checkout canceled. Continue shopping.")
+        elif choice == 6:  # Add/remove from wishlist
+            if customer is None:
+                print("Please create a customer first (Option 1).")
+            else:
+                print("\n===== Available Products =====")
+                for i, product in enumerate(products, start=1):
+                    print(f"{i}. {product}")
+
+                product_index = int(input("Enter product index to add/remove from wishlist (0 to cancel): "))
+                if product_index == 0:
+                    continue
+
+                product_index -= 1  # Adjust for 0-based indexing
+                if 0 <= product_index < len(products):
+                    product = products[product_index]
+                    if product in customer.wishlist:
+                        customer.remove_from_wishlist(product)
+                        print(f"'{product.name}' removed from wishlist.")
+                    else:
+                        customer.add_to_wishlist(product)
+                        print(f"'{product.name}' added to wishlist.")
+                else:
+                    print("Invalid product index. Please choose a valid product.")
+
+
+        elif choice == 7: # View wishlist 
+            if customer is None:
+                print("Please create a customer first (Option 1).")
+            else:
+                print("\n===== Wishlist =====")
+                print(customer.view_wishlist())
 
         else:
             print("Invalid choice. Please choose a valid option.")
